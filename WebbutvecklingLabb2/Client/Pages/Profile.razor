@@ -1,0 +1,49 @@
+﻿@page "/profile"
+
+@using Microsoft.AspNetCore.Authorization
+
+@attribute [Authorize]
+
+@inject HttpClient HttpClient
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+
+<h3>Profile</h3>
+
+<EditForm Model="CustomerProfile" OnValidSubmit="SaveCustomerProfile">
+    <DataAnnotationsValidator />
+    <div class="mb-3">
+        <label for="email">E-Mail</label>
+        <InputText id="email" disabled="true" @bind-Value="CustomerProfile.EMail"></InputText>
+    </div>
+    <div class="mb-3">
+        <label for="firstName">First Name</label>
+        <InputText id="firstName" @bind-Value="CustomerProfile.FirstName"></InputText>
+    </div>
+    <div class="mb-3">
+        <label for="lastName">Last Name</label>
+        <InputText id="lastName" @bind-Value="CustomerProfile.LastName"></InputText>
+    </div>
+    <div class="mb-3">
+        <label for="phoneNumber">Phone Number</label>
+        <InputText id="phoneNumber" @bind-Value="CustomerProfile.PhoneNumber"></InputText>
+    </div>
+    <div class="mb-3">
+        <label for="country">Country</label>
+        <InputText id="country" @bind-Value="CustomerProfile.Country"></InputText>
+    </div>
+    <div class="mb-3">
+        <label for="city">City</label>
+        <InputText id="city" @bind-Value="CustomerProfile.City"></InputText>
+    </div>
+    <div class="mb-3">
+        <label for="postalCode">Postal Code</label>
+        <InputText id="postalCode" @bind-Value="CustomerProfile.PostalCode"></InputText>
+    </div>
+    <div class="mb-3">
+        <label for="address">Address</label>
+        <InputText id="address" @bind-Value="CustomerProfile.Address"></InputText>
+    </div>
+    <button class="btn btn-primary">Submit</button>
+    <ValidationSummary />
+</EditForm>

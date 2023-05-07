@@ -1,0 +1,96 @@
+﻿@page "/editProduct"
+@using WebbutvecklingLabb2.Shared.DTOs
+
+@inject HttpClient HttpClient
+@inject NavigationManager NavigationManager
+
+
+<div class="mb-3">
+    <label>Selected Product</label>
+    <select id="selectedProduct" @onchange="GetSelectedProduct">
+        @foreach (var product in Products)
+        {
+            <option value="@product.ProductNumber">@product.ProductName</option>
+        }
+    </select>
+</div>
+
+<EditForm Model="SelectedProduct" OnValidSubmit="SubmitProduct">
+    <DataAnnotationsValidator />
+    <div class="mb-3">
+        <label for="name">Name</label>
+        <InputText id="name" @bind-Value="SelectedProduct.ProductName"></InputText>
+    </div>
+    <div class="mb-3">
+        <label for="description">Description</label>
+        <InputText id="description" @bind-Value="SelectedProduct.ProductDescription"></InputText>
+    </div>
+    <div class="mb-3">
+        <label for="category">Category</label>
+        <InputText id="category" @bind-Value="SelectedProduct.Category"></InputText>
+    </div>
+    <div class="mb-3">
+        <label for="price">Price</label>
+        <InputNumber id="price" @bind-Value="SelectedProduct.Price"></InputNumber>
+    </div>
+    <div class="mb-3">
+        <label for="imageSource">Image Source</label>
+        <InputText id="imageSource" @bind-Value="SelectedProduct.ImageSource"></InputText>
+    </div>
+    <div class="mb-3">
+        <label for="isAvailable">Available</label>
+        <InputCheckbox id="isAvailable" @bind-Value="SelectedProduct.IsAvailable"></InputCheckbox>
+    </div>
+    <div class="container p-0">
+        <button class="btn btn-primary">Edit</button>
+    </div>
+    <ValidationSummary />
+</EditForm>
+<div class="container p-0">
+    <button class="btn btn-primary my-2" @onclick="DeleteProduct">Delete</button>
+</div>
+<div class="container p-0">
+    <button class="btn btn-primary" @onclick="BackButton">Back</button>
+</div>
+
+
+@code {
+    private ProductDto SelectedProduct = new();
+    private List<ProductDto>? Products { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetAllProducts();
+        await base.OnInitializedAsync();
+    }
+
+    private async Task SubmitProduct()
+    {
+        await HttpClient.PutAsJsonAsync($"products/{SelectedProduct.ProductNumber}", SelectedProduct);
+        await GetAllProducts();
+    }
+
+    private void GetSelectedProduct(ChangeEventArgs args)
+    {
+        var id = args.Value;
+        SelectedProduct = Products.Find(p => p.ProductNumber.Equals(id));
+    }
+
+    private async Task DeleteProduct()
+    {
+        await HttpClient.DeleteAsync($"products/{SelectedProduct.ProductNumber}");
+        await GetAllProducts();
+    }
+
+    private async Task GetAllProducts()
+    {
+        Products = await HttpClient.GetFromJsonAsync<List<ProductDto>>("/products");
+        SelectedProduct = Products.First();
+    }
+
+    private void BackButton()
+    {
+        NavigationManager.NavigateTo("stock");
+    }
+
+}

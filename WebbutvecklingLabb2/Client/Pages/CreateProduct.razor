@@ -1,0 +1,55 @@
+﻿@page "/createProduct"
+@using WebbutvecklingLabb2.Shared.DTOs
+
+@inject HttpClient HttpClient
+@inject NavigationManager NavigationManager
+
+
+<EditForm Model="Product" OnValidSubmit="SubmitProduct">
+    <DataAnnotationsValidator />
+    <div class="mb-3">
+        <label for="name">Name</label>
+        <InputText id="name" @bind-Value="Product.ProductName"></InputText>
+    </div>
+    <div class="mb-3">
+        <label for="description">Description</label>
+        <InputText id="description" @bind-Value="Product.ProductDescription"></InputText>
+    </div>
+    <div class="mb-3">
+        <label for="category">Category</label>
+        <InputText id="category" @bind-Value="Product.Category"></InputText>
+    </div>
+    <div class="mb-3">
+        <label for="price">Price</label>
+        <InputNumber id="price" @bind-Value="Product.Price"></InputNumber>
+    </div>
+    <div class="mb-3">
+        <label for="imageSource">Image Source</label>
+        <InputText id="imageSource" @bind-Value="Product.ImageSource"></InputText>
+    </div>
+    <div class="mb-3">
+        <label for="isAvailable">Available</label>
+        <InputCheckbox id="isAvailable" @bind-Value="Product.IsAvailable"></InputCheckbox>
+    </div>
+    <button class="btn btn-primary">Create</button>
+    <ValidationSummary />
+</EditForm>
+
+<div class="container text-center">
+    <button class="btn btn-primary" @onclick="BackButton">Back</button>
+</div>
+@code {
+    public ProductDto Product { get; set; } = new();
+
+    private async Task SubmitProduct()
+    {
+        await HttpClient.PostAsJsonAsync("/products", Product);
+        Product = new ProductDto();
+    }
+
+    private void BackButton()
+    {
+        NavigationManager.NavigateTo("/stock");
+    }
+
+}

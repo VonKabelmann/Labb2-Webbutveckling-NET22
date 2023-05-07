@@ -1,0 +1,88 @@
+﻿@page "/admin/orders"
+@using WebbutvecklingLabb2.Shared.DTOs
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize(Roles = "Admin")]
+
+@inject HttpClient HttpClient
+@inject NavigationManager NavigationManager
+
+<div class="container">
+    <label>Search by customer E-Mail</label>
+    <InputText @bind-Value="SearchString" @oninput="GetSearchFilterResults"></InputText>
+</div>
+
+<Virtualize Items="FilteredOrderList" Context="order">
+    <div class="container my-3 border border-2">
+        <h4 class="h4 mt-3">Customer E-Mail: @order.Customer.EMail</h4>
+        <h4 class="h4">Order Date: @order.OrderDate</h4>
+        <h5 class="h5 text-muted">Order Id: @order.Id</h5>
+        <table>
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Category</th>
+                    <th>Price</th>
+                    <th>Product Number</th>
+                    <th>Amount</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach (var orderItem in order.OrderedProducts)
+                {
+                    <tr>
+                        <td class="align-middle">
+                            @orderItem.Product.ProductName
+                        </td>
+                        <td class="align-middle">
+                            @orderItem.Product.ProductDescription
+                        </td>
+                        <td class="align-middle">
+                            @orderItem.Product.Category
+                        </td>
+                        <td class="align-middle">
+                            @orderItem.Product.Price
+                        </td>
+                        <td class="align-middle">
+                            @orderItem.Product.ProductNumber
+                        </td>
+                        <td class="align-middle">
+                            @orderItem.Amount
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </table>
+    </div>
+</Virtualize>
+
+<div class="container">
+    <button class="btn btn-primary" @onclick="CreateOrderNavigateButton">Create Test Order</button>
+</div>
+
+@code {
+    private List<OrderDto>? OrderList { get; set; } = new();
+    private List<OrderDto>? FilteredOrderList { get; set; } = new();
+    private string SearchString { get; set; } = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        OrderList = await HttpClient.GetFromJsonAsync<List<OrderDto>>("orders");
+        FilteredOrderList = OrderList;
+        await base.OnInitializedAsync();
+    }
+
+    private void GetSearchFilterResults(ChangeEventArgs args)
+    {
+        SearchString = args.Value.ToString();
+        FilteredOrderList = OrderList.FindAll(o => o.Customer.EMail.ToLower().Contains(SearchString.ToLower()));
+    }
+
+    private void CreateOrderNavigateButton()
+    {
+        NavigationManager.NavigateTo("admin/orders/create");
+    }
+
+}

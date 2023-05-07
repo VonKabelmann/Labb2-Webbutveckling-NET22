@@ -1,0 +1,121 @@
+﻿@page "/admin/orders/create"
+@using WebbutvecklingLabb2.Shared.DTOs
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize(Roles = "Admin")]
+
+@inject HttpClient HttpClient
+@inject NavigationManager NavigationManager
+
+<div class="container m-2">
+    <label>Customer</label>
+    <select @onchange="GetSelectedCustomer">
+        @foreach (var customer in CustomerList)
+        {
+            <option value="@customer.Id">@customer.EMail</option>
+        }
+    </select>
+</div>
+<div class="container m-2">
+    <label>Product</label>
+    <select @onchange="GetSelectedProduct">
+        @foreach (var product in ProductList)
+        {
+            <option value="@product.ProductNumber">@product.ProductName</option>
+        }
+    </select>
+</div>
+<div class="container m-2">
+    <button class="btn btn-primary" @onclick="AddProductToOrder">Add Product</button>
+    <button class="btn btn-primary" @onclick="ClearOrderItemList">Clear Products</button>
+    <button class="btn btn-primary" @onclick="SubmitOrder" disabled="@CannotExecuteSubmit">Create Order</button>
+    <button class="btn btn-primary" @onclick="BackButton">Back</button>
+</div>
+<div class="container">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var orderItem in OrderItemList)
+            {
+                <tr>
+                    <td class="align-middle">@orderItem.Product.ProductName</td>
+                    <td class="align-middle">@orderItem.Amount</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@code {
+    private List<CustomerDto>? CustomerList { get; set; } = new();
+    private CustomerDto SelectedCustomer { get; set; } = new();
+    private List<ProductDto>? ProductList { get; set; } = new();
+    private ProductDto SelectedProduct { get; set; } = new();
+    private List<OrderItemDto> OrderItemList { get; set; } = new();
+    private bool CannotExecuteSubmit => OrderItemList.Count == 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        CustomerList = await HttpClient.GetFromJsonAsync<List<CustomerDto>>("customers");
+        ProductList = await HttpClient.GetFromJsonAsync<List<ProductDto>>("products");
+        SelectedCustomer = CustomerList.First();
+        SelectedProduct = ProductList.First();
+        await base.OnInitializedAsync();
+    }
+
+    private void SubmitOrder()
+    {
+        var order = new OrderDto()
+        {
+            Customer = SelectedCustomer,
+            OrderDate = DateTime.Now,
+            OrderedProducts = OrderItemList
+        };
+        HttpClient.PostAsJsonAsync("orders", order);
+        NavigationManager.NavigateTo("admin/orders");
+    }
+
+    private void GetSelectedCustomer(ChangeEventArgs args)
+    {
+        var id = args.Value;
+        SelectedCustomer = CustomerList.Find(c => c.Id.Equals(id));
+    }
+
+    private void GetSelectedProduct(ChangeEventArgs args)
+    {
+        var id = args.Value;
+        SelectedProduct = ProductList.Find(c => c.ProductNumber.Equals(id));
+    }
+
+    private void AddProductToOrder()
+    {
+        if (OrderItemList.Any(orderItem => orderItem.Product.ProductNumber.Equals(SelectedProduct.ProductNumber)))
+        {
+            OrderItemList.Single(orderItem => orderItem.Product.ProductNumber.Equals(SelectedProduct.ProductNumber))
+                .Amount++;
+        }
+        else
+        {
+            OrderItemList.Add(new OrderItemDto()
+                {
+                    Amount = 1,
+                    Product = SelectedProduct
+                });
+        }
+    }
+
+    private void ClearOrderItemList()
+    {
+        OrderItemList = new List<OrderItemDto>();
+    }
+
+    private void BackButton()
+    {
+        NavigationManager.NavigateTo("admin/orders");
+    }
+
+}
