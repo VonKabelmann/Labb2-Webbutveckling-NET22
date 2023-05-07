@@ -1,23 +1,16 @@
-# README!!!!
+# Labb 2 Webbutveckling .NET22
 
-## Innan du kör igång applikationen behöver du veta följande:
+This was a project done as part of the "Webbutveckling med .NET" course at IT-Högskolan.
 
-* Du behöver köra en update-database för att genomföra migrations och skapa databas för att hantera ApplicationUsers.
-* Du behöver kopiera innehållet från pontus-labb3-secrets.json till en egen secrets.json för projektet. Jag skickar med innehållet i inlämningen på ITHSdistans (inlämningen tillåter inte att man bifogar) och för säkerhets skull skickar jag även filen till dig i ett PM på Discord.
-* Första ApplicationUser som registreras kommer att ha admin role och behörigheter. Därefter kommer alla andra att ha user role och behörigheter.
-* API specifikationen hittar du i rooten av repot. 
+The task was to create a REST-API using .NET 7.0 along with a clientapplication which I chose to do using a Blazor webassembly application. The application communicates with a MongoDB Atlas cluster. The application also communicates with a SQL database locally to handle authentication. The application was designed using minimal API aswell as repository with unit of work design patterns.
 
-## Övrigt
+Sadly I was in a bit of a rush when writing the frontend part of the application and thus I wasn't able to create a more visually appealing client application and the code behind in the frontend isn't as neat and clean as I would have liked it to be.
 
-Pga tidspress med frontenden så ser koden på klientdelen ganska kladdig ut. Jag tror dock den bör vara någorlunda lätt att läsa och förstå och den gör iallafall det den ska.
+In order to run the application through Visual Studio you need to perform the following tasks:
+* Run the 'update-database' command in the Package Manager Console to apply the migrations and create the SQL database needed for the application to be able to handle registering and login.
+* You need to add the connectionstring for the MongoDB Atlas cluster to your secrets.json which isn't provided in this repo (which I may provide to you upon request).
 
-
-
-
-
-
-
-
+The instructions given to us for the assignment were the following (in Swedish):
 
 # LABB 2 APIer
 
